@@ -1,4 +1,3 @@
 https://realpython.com/pygame-a-primer/
 
-Sprite Groups
-
+Altering the Object Constructors

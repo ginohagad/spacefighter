@@ -3,6 +3,7 @@
 import pygame, random
 
 from pygame.locals import (
+    RLEACCEL,
     K_UP,
     K_DOWN,
     K_LEFT,
@@ -19,6 +20,8 @@ SCREEN_HEIGHT= 600
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
+        self.surf = pygame.image.load('jet.png').convert()
+        self.surf.set_colorkey((255,255,255), RLEACCEL)
         self.surf = pygame.Surface((75, 25))
         self.surf.fill((255,255,255))
         self.rect = self.surf.get_rect()
@@ -66,7 +69,14 @@ pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+ADDENEMY = pygame.USEREVENT + 1
+pygame.time.set_timer(ADDENEMY, 250)
+
 player = Player()
+
+enemies = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group()
+all_sprites.add(player)
 
 running = True
 
@@ -80,10 +90,23 @@ while running:
         elif event.type == QUIT:
             running = False
 
+        elif event.type == ADDENEMY:
+            new_enemy = Enemy()
+            enemies.add(new_enemy)
+            all_sprites.add(new_enemy)
+
     pressed_keys = pygame.key.get_pressed()
 
     player.update(pressed_keys)
+    enemies.update()
 
     screen.fill((0,0,0))
-    screen.blit(player.surf, player.rect)
+
+    for ent in all_sprites:
+        screen.blit(ent.surf, ent.rect)
+
+    if pygame.sprite.spritecollideany(player, enemies):
+        player.kill()
+        running = False
+
     pygame.display.flip()
